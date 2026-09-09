@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import { Memory } from 'src/database';
 import { OnJob } from 'src/decorators';
@@ -7,6 +7,7 @@ import { AuthDto } from 'src/dtos/auth.dto';
 import { MemoryCreateDto, MemoryResponseDto, MemorySearchDto, MemoryUpdateDto, mapMemory } from 'src/dtos/memory.dto';
 import { DatabaseLock, JobName, MemoryType, Permission, QueueName, SystemMetadataKey } from 'src/enum';
 import { BaseService } from 'src/services/base.service';
+import { findOrFail } from 'src/utils/misc';
 import { addAssets, getMyPartnerIds, removeAssets } from 'src/utils/asset.util';
 
 const DAYS = 3;
@@ -98,7 +99,7 @@ export class MemoryService extends BaseService {
     const assetIds = dto.assetIds || [];
     const allowedAssetIds = await this.checkAccess({
       auth,
-      permission: Permission.AssetShare,
+      permission: Permission.AssetUpdate,
       ids: assetIds,
     });
     const memory = await this.memoryRepository.create(
@@ -139,7 +140,11 @@ export class MemoryService extends BaseService {
     await this.requireAccess({ auth, permission: Permission.MemoryRead, ids: [id] });
 
     const repos = { access: this.accessRepository, bulk: this.memoryRepository };
-    const results = await addAssets(auth, repos, { parentId: id, assetIds: dto.ids });
+    const results = await addAssets(auth, repos, {
+      parentId: id,
+      assetIds: dto.ids,
+      permission: Permission.AssetUpdate,
+    });
 
     const hasSuccess = results.some(({ success }) => success);
     if (hasSuccess) {
@@ -167,11 +172,7 @@ export class MemoryService extends BaseService {
     return results;
   }
 
-  private async findOrFail(id: string) {
-    const memory = await this.memoryRepository.get(id);
-    if (!memory) {
-      throw new BadRequestException('Memory not found');
-    }
-    return memory;
+  private findOrFail(id: string) {
+    return findOrFail(() => this.memoryRepository.get(id), 'Memory');
   }
 }
