@@ -177,7 +177,7 @@ export class MemoryService extends BaseService {
     const assetIds = dto.assetIds || [];
     const allowedAssetIds = await this.checkAccess({
       auth,
-      permission: Permission.AssetUpdate,
+      permission: Permission.AssetShare,
       ids: assetIds,
     });
     const memory = await this.memoryRepository.create(
@@ -221,7 +221,7 @@ export class MemoryService extends BaseService {
     const results = await addAssets(auth, repos, {
       parentId: id,
       assetIds: dto.ids,
-      permission: Permission.AssetUpdate,
+      permission: Permission.AssetShare,
     });
 
     const hasSuccess = results.some(({ success }) => success);
