@@ -250,7 +250,7 @@ describe(MemoryService.name, () => {
       );
     });
 
-    it('should not link a partner asset', async () => {
+    it('should link a partner asset', async () => {
       const { sut, ctx } = setup();
       const { user: owner } = await ctx.newUser();
       const { user: partner } = await ctx.newUser();
@@ -264,12 +264,14 @@ describe(MemoryService.name, () => {
         assetIds: [asset.id],
       };
 
-      await expect(sut.create(auth, dto)).resolves.toEqual(expect.objectContaining({ assets: [] }));
+      await expect(sut.create(auth, dto)).resolves.toEqual(
+        expect.objectContaining({ assets: [expect.objectContaining({ id: asset.id })] }),
+      );
     });
   });
 
   describe('addAssets', () => {
-    it('should not link a partner asset', async () => {
+    it('should link a partner asset', async () => {
       const { sut, ctx } = setup();
       const { user: owner } = await ctx.newUser();
       const { user: partner } = await ctx.newUser();
@@ -283,7 +285,7 @@ describe(MemoryService.name, () => {
       });
 
       await expect(sut.addAssets(auth, memory.id, { ids: [asset.id] })).resolves.toEqual([
-        { id: asset.id, success: false, error: BulkIdErrorReason.NO_PERMISSION },
+        { id: asset.id, success: true },
       ]);
     });
   });
