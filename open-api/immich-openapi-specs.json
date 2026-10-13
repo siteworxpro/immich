@@ -9805,6 +9805,15 @@
             }
           },
           {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "description": "Filter by person name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "page",
             "required": false,
             "in": "query",
@@ -10120,16 +10129,16 @@
         ],
         "x-immich-history": [
           {
-            "version": "v3.3",
+            "version": "v3.3.0",
             "state": "Added"
           },
           {
-            "version": "v3.3",
-            "state": "Stable"
+            "version": "v3.3.0",
+            "state": "Beta"
           }
         ],
-        "x-immich-permission": "person.delete",
-        "x-immich-state": "Stable"
+        "x-immich-permission": "person.update",
+        "x-immich-state": "Beta"
       },
       "get": {
         "description": "Retrieve a list of users and the people to which they have been given access",
@@ -10215,26 +10224,26 @@
         ],
         "x-immich-history": [
           {
-            "version": "v3.3",
+            "version": "v3.3.0",
             "state": "Added"
           },
           {
-            "version": "v3.3",
-            "state": "Stable"
+            "version": "v3.3.0",
+            "state": "Beta"
           }
         ],
         "x-immich-permission": "person.read",
-        "x-immich-state": "Stable"
+        "x-immich-state": "Beta"
       },
       "put": {
         "description": "Give users access to people",
-        "operationId": "addUsersToPeople",
+        "operationId": "upsertPeopleUsers",
         "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PersonUsersCreateDto"
+                "$ref": "#/components/schemas/PeopleUsersUpsertDto"
               }
             }
           },
@@ -10256,22 +10265,22 @@
             "api_key": []
           }
         ],
-        "summary": "Give users access to people",
+        "summary": "Upsert user access",
         "tags": [
           "People"
         ],
         "x-immich-history": [
           {
-            "version": "v3.3",
+            "version": "v3.3.0",
             "state": "Added"
           },
           {
-            "version": "v3.3",
-            "state": "Stable"
+            "version": "v3.3.0",
+            "state": "Beta"
           }
         ],
         "x-immich-permission": "person.update",
-        "x-immich-state": "Stable"
+        "x-immich-state": "Beta"
       }
     },
     "/people/{id}": {
@@ -18202,7 +18211,7 @@
   "info": {
     "title": "Immich",
     "description": "Immich API",
-    "version": "3.3.0-rc.0",
+    "version": "3.3.1",
     "contact": {}
   },
   "tags": [
@@ -23524,6 +23533,12 @@
         ],
         "type": "string"
       },
+      "MemoryTypeV1": {
+        "enum": [
+          "on_this_day"
+        ],
+        "type": "string"
+      },
       "MemoryUpdateDto": {
         "properties": {
           "isSaved": {
@@ -24944,11 +24959,15 @@
           "sidebarWeb": {
             "description": "Whether people appear in web sidebar",
             "type": "boolean"
+          },
+          "updateStrategy": {
+            "$ref": "#/components/schemas/PersonUpdateStrategy"
           }
         },
         "required": [
           "enabled",
-          "sidebarWeb"
+          "sidebarWeb",
+          "updateStrategy"
         ],
         "type": "object"
       },
@@ -25011,6 +25030,9 @@
           "sidebarWeb": {
             "description": "Whether people appear in web sidebar",
             "type": "boolean"
+          },
+          "updateStrategy": {
+            "$ref": "#/components/schemas/PersonUpdateStrategy"
           }
         },
         "type": "object"
@@ -25069,7 +25091,7 @@
             "type": "string"
           },
           "userId": {
-            "description": "User ID",
+            "description": "Restrict the update to the person record of this User ID",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
             "type": "string"
@@ -25125,6 +25147,47 @@
           "role"
         ],
         "type": "object"
+      },
+      "PeopleUsersUpsertDto": {
+        "properties": {
+          "personIds": {
+            "description": "Person IDs, required when type is omitted",
+            "items": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "role": {
+            "$ref": "#/components/schemas/PersonUserRole",
+            "description": "Role that should be applied"
+          },
+          "sharedWithIds": {
+            "description": "User IDs that should be given access to the person",
+            "items": {
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PeopleUsersUpsertType"
+          }
+        },
+        "required": [
+          "role",
+          "sharedWithIds"
+        ],
+        "type": "object"
+      },
+      "PeopleUsersUpsertType": {
+        "description": "Which people to update when personIds is omitted",
+        "enum": [
+          "everyone"
+        ],
+        "type": "string"
       },
       "Permission": {
         "description": "List of permissions",
@@ -25527,13 +25590,21 @@
             "type": "string"
           },
           "userId": {
-            "description": "User ID",
+            "description": "Restrict the update to the person record of this User ID",
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
             "type": "string"
           }
         },
         "type": "object"
+      },
+      "PersonUpdateStrategy": {
+        "description": "Which person records to update when editing a person",
+        "enum": [
+          "self",
+          "everyone"
+        ],
+        "type": "string"
       },
       "PersonUserRole": {
         "description": "Levels of access for managing people resources on behalf of another user.",
@@ -25543,38 +25614,6 @@
           "admin"
         ],
         "type": "string"
-      },
-      "PersonUsersCreateDto": {
-        "properties": {
-          "personIds": {
-            "description": "Person IDs",
-            "items": {
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "role": {
-            "$ref": "#/components/schemas/PersonUserRole",
-            "description": "Role that should be applied"
-          },
-          "sharedWithIds": {
-            "description": "User IDs that should be given access to the person",
-            "items": {
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-              "type": "string"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "personIds",
-          "role",
-          "sharedWithIds"
-        ],
-        "type": "object"
       },
       "PersonUsersDeleteDto": {
         "items": {
@@ -31396,8 +31435,10 @@
           "AlbumToAssetDeleteV1",
           "AlbumToAssetBackfillV1",
           "MemoryV1",
+          "MemoryV2",
           "MemoryDeleteV1",
           "MemoryToAssetV1",
+          "MemoryToAssetV2",
           "MemoryToAssetDeleteV1",
           "StackV1",
           "StackDeleteV1",
@@ -31472,6 +31513,102 @@
         "type": "object"
       },
       "SyncMemoryV1": {
+        "properties": {
+          "createdAt": {
+            "description": "Created at",
+            "example": "2024-01-01T00:00:00.000Z",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "type": "string"
+          },
+          "data": {
+            "additionalProperties": {},
+            "description": "Data",
+            "type": "object"
+          },
+          "deletedAt": {
+            "description": "Deleted at",
+            "example": "2024-01-01T00:00:00.000Z",
+            "format": "date-time",
+            "nullable": true,
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "type": "string"
+          },
+          "hideAt": {
+            "description": "Hide at",
+            "example": "2024-01-01T00:00:00.000Z",
+            "format": "date-time",
+            "nullable": true,
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "type": "string"
+          },
+          "id": {
+            "description": "Memory ID",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+            "type": "string"
+          },
+          "isSaved": {
+            "description": "Is saved",
+            "type": "boolean"
+          },
+          "memoryAt": {
+            "description": "Memory at",
+            "example": "2024-01-01T00:00:00.000Z",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "type": "string"
+          },
+          "ownerId": {
+            "description": "Owner ID",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})$",
+            "type": "string"
+          },
+          "seenAt": {
+            "description": "Seen at",
+            "example": "2024-01-01T00:00:00.000Z",
+            "format": "date-time",
+            "nullable": true,
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "type": "string"
+          },
+          "showAt": {
+            "description": "Show at",
+            "example": "2024-01-01T00:00:00.000Z",
+            "format": "date-time",
+            "nullable": true,
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/MemoryTypeV1"
+          },
+          "updatedAt": {
+            "description": "Updated at",
+            "example": "2024-01-01T00:00:00.000Z",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "createdAt",
+          "data",
+          "deletedAt",
+          "hideAt",
+          "id",
+          "isSaved",
+          "memoryAt",
+          "ownerId",
+          "seenAt",
+          "showAt",
+          "type",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "SyncMemoryV2": {
         "properties": {
           "createdAt": {
             "description": "Created at",
@@ -31720,7 +31857,9 @@
           "AuthUsersV1",
           "AuthUsersV2",
           "MemoriesV1",
+          "MemoriesV2",
           "MemoryToAssetsV1",
+          "MemoryToAssetsV2",
           "PartnersV1",
           "PartnerAssetsV1",
           "PartnerAssetsV2",

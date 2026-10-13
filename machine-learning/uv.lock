@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12, <4.0"
 resolution-markers = [
     "python_full_version >= '3.15' and sys_platform == 'darwin'",
@@ -676,7 +676,7 @@ wheels = [
 
 [[package]]
 name = "immich-ml"
-version = "3.3.0rc0"
+version = "3.3.1"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
@@ -744,6 +744,11 @@ lint = [
     { name = "types-simplejson" },
     { name = "types-ujson" },
 ]
+onnxruntime-openvino-build = [
+    { name = "openvino" },
+    { name = "setuptools" },
+    { name = "wheel" },
+]
 test = [
     { name = "httpx" },
     { name = "pytest" },
@@ -764,7 +769,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.95.2,<1.0" },
     { name = "gunicorn", specifier = ">=21.1.0" },
     { name = "huggingface-hub", specifier = ">=1.0,<2.0" },
-    { name = "immich-model", git = "https://github.com/immich-app/ml-models.git?rev=88d2b64ff95ce7117760660681d95e0e1308819b" },
+    { name = "immich-model", git = "https://github.com/immich-app/ml-models.git?rev=8bf3fd1b44b0c8608f52fb6e50ddff52826576d8" },
     { name = "numpy", specifier = ">=2.4.0,<3.0" },
     { name = "onnx", specifier = ">=1.22.0" },
     { name = "onnxruntime", marker = "extra == 'armnn'", specifier = ">=1.23.2,<2" },
@@ -813,6 +818,11 @@ lint = [
     { name = "types-simplejson", specifier = ">=3.20.0.20250218" },
     { name = "types-ujson", specifier = ">=5.10.0.20240515" },
 ]
+onnxruntime-openvino-build = [
+    { name = "openvino", specifier = "==2026.5.0.dev20261005", index = "https://storage.openvinotoolkit.org/simple/wheels/nightly" },
+    { name = "setuptools" },
+    { name = "wheel" },
+]
 test = [
     { name = "httpx", specifier = ">=0.24.1" },
     { name = "pytest", specifier = ">=7.3.1" },
@@ -831,7 +841,7 @@ types = [
 [[package]]
 name = "immich-model"
 version = "0.2.0"
-source = { git = "https://github.com/immich-app/ml-models.git?rev=88d2b64ff95ce7117760660681d95e0e1308819b#88d2b64ff95ce7117760660681d95e0e1308819b" }
+source = { git = "https://github.com/immich-app/ml-models.git?rev=8bf3fd1b44b0c8608f52fb6e50ddff52826576d8#8bf3fd1b44b0c8608f52fb6e50ddff52826576d8" }
 dependencies = [
     { name = "numpy" },
     { name = "onnx" },
@@ -1455,6 +1465,42 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ae/ce/7f538891722a4f06921419d55bac6f41729258d54442861edb2de0dbdf5e/opencv_python_headless-4.14.0.94-cp37-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:211e581f5a4670acbbe08fff36a35e9946039d2eea28b80394632d036d1be527", size = 61960165, upload-time = "2026-07-28T19:20:33.074Z" },
     { url = "https://files.pythonhosted.org/packages/e9/91/ded03abad74d7264fa6bc7c923d7cade6f94a9023eeb372cfad54c2d0334/opencv_python_headless-4.14.0.94-cp37-abi3-win32.whl", hash = "sha256:f70296aa7ac9d7ade0d925c43fdc006c83e20a23f30e2f40f1b82c74a7a54460", size = 33030271, upload-time = "2026-07-28T18:32:39.447Z" },
     { url = "https://files.pythonhosted.org/packages/ad/8d/db8673846ee53cbb5de4c2b4decc11cf733e203eb7d5146297869f69bd48/opencv_python_headless-4.14.0.94-cp37-abi3-win_amd64.whl", hash = "sha256:cbed65415b8f6a9541c705afe3e64795840524d0ff3bc58f507826284a1dc64b", size = 41028030, upload-time = "2026-07-28T18:32:36.724Z" },
+]
+
+[[package]]
+name = "openvino"
+version = "2026.5.0.dev20261005"
+source = { registry = "https://storage.openvinotoolkit.org/simple/wheels/nightly" }
+dependencies = [
+    { name = "numpy" },
+    { name = "openvino-telemetry" },
+]
+wheels = [
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp312-cp312-macosx_11_0_arm64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp312-cp312-manylinux_2_28_x86_64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp312-cp312-manylinux_2_35_aarch64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp312-cp312-win_amd64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp313-cp313-macosx_11_0_arm64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp313-cp313-manylinux_2_28_x86_64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp313-cp313-manylinux_2_35_aarch64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp313-cp313-win_amd64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp314-cp314-macosx_11_0_arm64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp314-cp314-manylinux_2_28_x86_64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp314-cp314-manylinux_2_35_aarch64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp314-cp314-win_amd64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp314-cp314t-macosx_11_0_arm64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp314-cp314t-manylinux_2_28_x86_64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp314-cp314t-manylinux_2_35_aarch64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.5.0.dev20261005-23342-cp314-cp314t-win_amd64.whl" },
+]
+
+[[package]]
+name = "openvino-telemetry"
+version = "2025.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/71/8a/89d82f1a9d913fb266c2e6dc2f6030935db24b7152963a8db6c4f039787f/openvino_telemetry-2025.2.0.tar.gz", hash = "sha256:8bf8127218e51e99547bf38b8fb85a8b31c9bf96e6f3a82eb0b3b6a34155977c", size = 18894, upload-time = "2025-07-07T10:29:51.159Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3b/ac/5ab0ca0aa269ad3c73f7bfc3801b10e5f56f75a31bf68c1ae8bd51cf70a4/openvino_telemetry-2025.2.0-py3-none-any.whl", hash = "sha256:bcb667e83a44f202ecf4cfa49281715c6d7e21499daec04ff853b7f964833599", size = 25227, upload-time = "2025-07-07T10:29:50.189Z" },
 ]
 
 [[package]]
@@ -2449,6 +2495,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/02/51/2e0fc149e7a810d300422ab543f87f2bcf64d985eb6f1228c4efd6e4f8d4/werkzeug-3.0.3.tar.gz", hash = "sha256:097e5bfda9f0aba8da6b8545146def481d06aa7d3266e7448e2cccf67dd8bd18", size = 803342, upload-time = "2024-05-05T23:10:31.999Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9d/6e/e792999e816d19d7fcbfa94c730936750036d65656a76a5a688b57a656c4/werkzeug-3.0.3-py3-none-any.whl", hash = "sha256:fc9645dc43e03e4d630d23143a04a7f947a9a3b5727cd535fdfe155a17cc48c8", size = 227274, upload-time = "2024-05-05T23:10:29.567Z" },
+]
+
+[[package]]
+name = "wheel"
+version = "0.45.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/98/2d9906746cdc6a6ef809ae6338005b3f21bb568bea3165cfc6a243fdc25c/wheel-0.45.1.tar.gz", hash = "sha256:661e1abd9198507b1409a20c02106d9670b2576e916d58f520316666abca6729", size = 107545, upload-time = "2024-11-23T00:18:23.513Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0b/2c/87f3254fd8ffd29e4c02732eee68a83a1d3c346ae39bc6822dcbcb697f2b/wheel-0.45.1-py3-none-any.whl", hash = "sha256:708e7481cc80179af0e556bbf0cc00b8444c7321e2700b8d8580231d13017248", size = 72494, upload-time = "2024-11-23T00:18:21.207Z" },
 ]
 
 [[package]]
